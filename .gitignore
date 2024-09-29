@@ -1,0 +1,77 @@
+# Visual Studio specific
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+*.user
+*.suo
+*.opendb
+*.VC.db
+
+# C++ build artifacts
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.exp
+*.log
+*.pch
+*.idb
+*.ipdb
+*.iobj
+*.sbr
+
+# OpenGL/GLFW specific (if you're using GLFW or other OpenGL libraries)
+bin/
+lib/
+*.dll
+
+# Build directories
+Debug/
+Release/
+x64/
+x86/
+ARM/
+ARM64/
+
+# CMake specific (if you're using CMake)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Other IDE specific
+.idea/
+*.ncb
+*.sdf
+*.ipch
+*.tlog
+*.lastbuildstate
+
+# Logs and temporary files
+*.log
+*.tmp
+*.log
+*.temp
+
+# User-specific VS Code settings (if you're using VS Code alongside)
+.vscode/
+
+# Cache files
+*.cache
+*.obj
+*.o
+
+# Ignore compiled OpenGL shader binaries
+*.spv
+
+# Package management files (like NuGet)
+*.nupkg
+*.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Backup files
+*_bak.*
+
