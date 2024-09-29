@@ -79,13 +79,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ include;C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ lib;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies);glew32.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,15 +96,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ include;C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ lib;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;opengl32.lib;%(AdditionalDependencies);glew32.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -113,10 +113,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glew32.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,12 +130,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\OpenGLwrappers\glm-0.9.7.5\glm;C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ include;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\OpenGLwrappers\glew-1.10.0-win32\glew-1.10.0\ lib\Release\Win32;C:\OpenGLwrappers\freeglut-MSVC-2.8.1-1.mp\freeglut\ lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glew32.lib;opengl32.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
