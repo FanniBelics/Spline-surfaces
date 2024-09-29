@@ -6,14 +6,41 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
+#include <vector>
+
+//Dff 3D points
+struct Point3D {
+	float x;
+	float y;
+	float z;
+};
+
+
 using namespace std;
 
 int N =4 , M = 4;
+
+
+//matrix for points
+std::vector<std::vector<Point3D>> grid;
+
 
 // Initialization routine.
 void setup(void)
 {
 	glClearColor(1.0, 1.0, 1.0, 0.0);
+
+
+	grid.resize(N);
+	for (int i = 0; i < N; ++i) {
+		grid[i].resize(M);
+	}
+
+	for (int i = 0; i < N; ++i) {
+		for (int j = 0; j < M; ++j) {
+			grid[i][j] = { static_cast<float>(i*10), static_cast<float>(j*10) , 0.0f}; // x, y, z coordinates
+		}
+	}
 }
 
 // Drawing routine.
@@ -23,58 +50,35 @@ void drawScene(void)
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glLoadIdentity();
 
-	glColor3f(0.518, 0.8, 0.82);
-	glBegin(GL_TRIANGLE_STRIP);
+	glTranslatef(5.0, 5.0, 0.0);
 
-	glVertex3f(30.0, 30.0, 0.0);
-	glVertex3f(20.0, 20.0, 0.0);
-	glVertex3f(30.0, 70.0, 0.0);
-	glVertex3f(20.0, 80.0, 0.0);
-	glVertex3f(70.0, 70.0, 0.0);
-	glVertex3f(80.0, 80.0, 0.0);
-	glVertex3f(70.0, 30.0, 0.0);
-	glVertex3f(80.0, 20.0, 0.0);
-	glVertex3f(30.0, 30.0, 0.0);
-	glVertex3f(20.0, 20.0, 0.0);
-
-	glEnd();
-
-	//Inlines
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glColor3f(0.0, 0.0, 0.0);
-	glBegin(GL_LINE_STRIP);
 
-	glVertex3f(70.0, 30.0, 0.0);
-	glVertex3f(80.0, 20.0, 0.0);
-	glVertex3f(30.0, 30.0, 0.0);
-	glVertex3f(20.0, 20.0, 0.0);
-	glVertex3f(30.0, 70.0, 0.0);
-	glVertex3f(20.0, 80.0, 0.0);
-	glVertex3f(70.0, 70.0, 0.0);
-	glVertex3f(80.0, 80.0, 0.0);
-	glVertex3f(70.0, 30.0, 0.0);
+	for (int i = 0; i < N; ++i) {
 
-	glEnd();
+		glBegin(GL_LINE_STRIP);
 
-	//Inner outline
-	glColor3f(0.345, 0.557, 0.553);
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(30.0, 30.0, 0.0);
-	glVertex3f(30.0, 70.0, 0.0);
-	glVertex3f(70.0, 70.0, 0.0);
-	glVertex3f(70.0, 30.0, 0.0);
+		for (int j = 0; j < M; ++j) {
+			glVertex3f(grid[i][j].x, grid[i][j].y, grid[i][j].z);
+		}
 
-	glEnd();
+		glEnd();
+	}
 
-	//Outer Outline
-	glBegin(GL_LINE_LOOP);
-	glVertex3f(20.0, 20.0, 0.0);
-	glVertex3f(20.0, 80.0, 0.0);
-	glVertex3f(80.0, 80.0, 0.0);
-	glVertex3f(80.0, 20.0, 0.0);
+	for (int i = 0; i < M; ++i) {
 
-	glEnd();
+		glBegin(GL_LINE_STRIP);
+
+		for (int j = 0; j < N; ++j) {
+			glVertex3f(grid[j][i].x, grid[j][i].y, grid[j][i].z);
+		}
+
+		glEnd();
+	}
+	
 
 	glFlush();
 }
