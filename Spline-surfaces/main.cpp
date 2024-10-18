@@ -35,6 +35,7 @@ int nP = 0, mP = 0;
 
 //matrix for points
 std::vector<std::vector<Point3D>> grid;
+std::vector<std::vector<Point3D>> surfaceGrid(40, std::vector<Point3D>(40));
 
 // Angles to rotate
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; 
