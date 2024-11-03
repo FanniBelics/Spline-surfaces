@@ -19,9 +19,9 @@ struct Point3D {
 
 
 //Buttons
-Button splineButton(-9, 8, "Spline");
-Button splineButton2(-9, 6.75, "Spline");
-Button splineButton3(-9, 5.5, "Spline");
+Button splineButton(-9, 8, "B-Spline");
+Button splineButton2(-9, 6.75, "Knots");
+Button splineButton3(-9, 5.5, "NURBS");
 
 
 using namespace std;
