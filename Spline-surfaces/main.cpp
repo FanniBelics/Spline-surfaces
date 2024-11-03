@@ -22,6 +22,7 @@ using namespace std;
 
 bool isMainVector = true;
 bool isGrid = true;
+bool isSurfaceGrid = true;
 bool isPoints = true;
 bool isSelectedPoint = true;
 bool isSelectedVector = true;
@@ -35,7 +36,7 @@ int nP = 0, mP = 0;
 
 //matrix for points
 std::vector<std::vector<Point3D>> grid;
-std::vector<std::vector<Point3D>> surfaceGrid(40, std::vector<Point3D>(40));
+std::vector<std::vector<Point3D>> surfaceGrid(32, std::vector<Point3D>(32));
 
 // Angles to rotate
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; 
@@ -66,7 +67,14 @@ void setup(void)
 
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < M; ++j) {
-			grid[i][j] = { static_cast<float>((i*8.0f) / N), 0.0f ,static_cast<float>((j*8.0f) / M)}; // x, y, z coordinates
+			grid[i][j] = { static_cast<float>((i*8.0f) / (N-1)), 0.0f ,static_cast<float>((j*8.0f) / (M-1))}; // x, y, z coordinates
+		}
+	}
+
+	//testing purpuses currently
+	for (int i = 0; i < surfaceGrid.size(); i++) {
+		for (int j = 0; j < surfaceGrid[i].size(); j++) {
+			surfaceGrid[i][j] = { static_cast<float>((i * 8.0f) / (surfaceGrid.size()-1)), 0.0f ,static_cast<float>((j * 8.0f) / (surfaceGrid[i].size()-1))};
 		}
 	}
 }
@@ -76,7 +84,7 @@ void drawScene(void)
 {
 
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
 
@@ -94,6 +102,8 @@ void drawScene(void)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glColor3f(0.0, 0.0, 0.0);
+
+
 
 	if (isMainVector) {
 		glColor3f(1.0, 0.0, 0.0);
@@ -116,6 +126,37 @@ void drawScene(void)
 
 		glTranslatef(1.0, 0.0, 1.0);
 
+		glColor3f(0.0, 0.0, 0.0);
+	}
+
+	if (isSurfaceGrid) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor3f(1.0, 0.5, 0.0);
+
+		if (surfaceGrid.size() == 1) {
+			glBegin(GL_LINES);
+
+			for (int j = 0; j < surfaceGrid[0].size(); j++) {
+				glVertex3f(surfaceGrid[0][j].x, surfaceGrid[0][j].y, surfaceGrid[0][j].z);
+			}
+
+			glEnd();
+		}
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
+				glBegin(GL_TRIANGLE_STRIP);
+
+				for (int j = 0; j < surfaceGrid[i].size(); j++) {
+					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
+					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
+				}
+
+				glEnd();
+			}
+		}	
+		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
 	}
 
@@ -172,21 +213,25 @@ void drawScene(void)
 	}
 
 	if (isPoints) {
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glColor3f(1.0, 0.0, 1.0);
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < M; j++) {
 				drawSphere(grid[i][j].x, grid[i][j].y, grid[i][j].z, 0.1f);
 			}
 		}
-
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
 	}
 
 	if (isSelectedPoint) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glColor3f(0.0, 1.0, 1.0);
 
 		drawSphere(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z, 0.1f);
 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
 	}
 	
@@ -335,6 +380,32 @@ void printInteraction(void)
 	cout << "Set, N: " << N << " M: " << M << endl;
 }
 
+void setupLighting() {
+	
+	GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f }; 
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+
+	GLfloat lightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
+	GLfloat lightPosition[] = { 1.0f, 1.0f, 1.0f, 0.0f }; 
+
+	glEnable(GL_LIGHT0);                 
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+}
+
+void setupMaterial() {
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+	GLfloat materialSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+
+
+	GLfloat materialShininess = 50.0f;
+	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
+}
+
+
 // Main routine.
 int main(int argc, char** argv)
 {
@@ -354,6 +425,11 @@ int main(int argc, char** argv)
 
 	glewExperimental = GL_TRUE;
 	glewInit();
+
+	glEnable(GL_DEPTH_TEST);  
+	glEnable(GL_LIGHTING);    
+	setupLighting();
+	setupMaterial();
 
 	setup();
 
