@@ -8,6 +8,8 @@
 
 #include <vector>
 
+#include "Button.h"
+
 //Dff 3D points
 struct Point3D {
 	float x;
@@ -16,7 +18,17 @@ struct Point3D {
 };
 
 
+//Buttons
+Button splineButton(-9, 8, "Spline");
+Button splineButton2(-9, 6.75, "Spline");
+Button splineButton3(-9, 5.5, "Spline");
+
+
 using namespace std;
+
+void testFunction() {
+	cout << "Hello!" << endl;
+}
 
 //Globals
 
@@ -69,6 +81,7 @@ void setup(void)
 			grid[i][j] = { static_cast<float>((i*8.0f) / N), 0.0f ,static_cast<float>((j*8.0f) / M)}; // x, y, z coordinates
 		}
 	}
+
 }
 
 // Drawing routine.
@@ -79,6 +92,12 @@ void drawScene(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glLoadIdentity();
+
+	glPushMatrix();
+	splineButton.draw();
+	splineButton2.draw();
+	splineButton3.draw();
+	glPopMatrix();
 
 	gluLookAt(
 		camX, camY, camZ,    
@@ -189,7 +208,7 @@ void drawScene(void)
 
 		glColor3f(0.0, 0.0, 0.0);
 	}
-	
+
 
 	glFlush();
 }
@@ -323,6 +342,21 @@ void keyInput(unsigned char key, int x, int y)
 	}
 }
 
+void mouseCallback(int button, int state, int x, int y) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		// Get the window height
+		int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+		int windowWidhth = glutGet(GLUT_WINDOW_WIDTH);
+
+		float oglX = (static_cast<float>(x) / windowWidhth) * 20.0f - 10.0f; // Normalize to [-10, 10]
+		float oglY = (static_cast<float>(windowHeight - y) / windowHeight) * (10.0f - (-10.0f)) - 10.0f; // Normalize to [-10, 10]
+
+		splineButton.isButtonPressed(oglX, oglY, testFunction);
+		splineButton2.isButtonPressed(oglX, oglY, testFunction);
+		splineButton3.isButtonPressed(oglX, oglY, testFunction);
+	}
+}
+
 // Routine to output interaction instructions to the C++ window.
 void printInteraction(void)
 {
@@ -351,6 +385,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(drawScene);
 	glutReshapeFunc(resize);
 	glutKeyboardFunc(keyInput);
+	glutMouseFunc(mouseCallback);
 
 	glewExperimental = GL_TRUE;
 	glewInit();
