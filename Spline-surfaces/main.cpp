@@ -9,13 +9,9 @@
 #include <vector>
 
 #include "Button.h"
+#include "spline.h"
+#include "types.cpp"
 
-//Dff 3D points
-struct Point3D {
-	float x;
-	float y;
-	float z;
-};
 
 
 //Buttons
@@ -23,11 +19,21 @@ Button splineButton(-9, 8, "B-Spline");
 Button splineButton2(-9, 6.75, "Knots");
 Button splineButton3(-9, 5.5, "NURBS");
 
+SurfaceTypes current = NONE;
+
 
 using namespace std;
 
-void testFunction() {
-	cout << "Hello!" << endl;
+void getSpline() {
+	current = SPLINE;
+}
+
+void getKnots() {
+	current = KNOTS;
+}
+
+void getNURBS() {
+	current = NURBS;
 }
 
 //Globals
@@ -51,6 +57,7 @@ std::vector<std::vector<Point3D>> surfaceGrid(40, std::vector<Point3D>(40));
 
 // Angles to rotate
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; 
+
 
 void drawSphere(float x, float y, float z, float radius) {
 	glPushMatrix();
@@ -209,6 +216,16 @@ void drawScene(void)
 		glColor3f(0.0, 0.0, 0.0);
 	}
 
+	if (current == SPLINE) {
+		drawBSplineSurface(grid, 100);
+	}
+	else if (current == NURBS) {
+		
+	}
+	else if (current == KNOTS) {
+
+	}
+
 
 	glFlush();
 }
@@ -351,9 +368,9 @@ void mouseCallback(int button, int state, int x, int y) {
 		float oglX = (static_cast<float>(x) / windowWidhth) * 20.0f - 10.0f; // Normalize to [-10, 10]
 		float oglY = (static_cast<float>(windowHeight - y) / windowHeight) * (10.0f - (-10.0f)) - 10.0f; // Normalize to [-10, 10]
 
-		splineButton.isButtonPressed(oglX, oglY, testFunction);
-		splineButton2.isButtonPressed(oglX, oglY, testFunction);
-		splineButton3.isButtonPressed(oglX, oglY, testFunction);
+		splineButton.isButtonPressed(oglX, oglY, getSpline);
+		splineButton2.isButtonPressed(oglX, oglY, getKnots);
+		splineButton3.isButtonPressed(oglX, oglY, getNURBS);
 	}
 }
 
