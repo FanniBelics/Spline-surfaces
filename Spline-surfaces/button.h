@@ -18,7 +18,7 @@ public:
 	float getY() const;
 	void isButtonPressed(float mouseX, float mouseY, std::function<void()> func);
 	bool contains(float x, float y, float width = width, float height = height) const;
-	void draw(float width = width, float height = height);
+	void draw(bool isPressed = false, float width = width, float height = height);
 
 };
 

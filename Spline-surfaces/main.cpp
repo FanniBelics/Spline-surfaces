@@ -9,6 +9,11 @@
 #include <vector>
 
 #include "Button.h"
+#include "SurfaceTypes.h"
+
+
+using namespace std;
+
 
 //Dff 3D points
 struct Point3D {
@@ -19,15 +24,38 @@ struct Point3D {
 
 
 //Buttons
-Button splineButton(-9, 8, "Spline");
-Button splineButton2(-9, 6.75, "Spline");
-Button splineButton3(-9, 5.5, "Spline");
+Button splineButton(-9, 8, "Bezier");
+Button splineButton2(-9, 6.75, "B-spline");
+Button splineButton3(-9, 5.5, "Nurbs");
 
+SurfaceType current = NONE;
 
-using namespace std;
-
-void testFunction() {
-	cout << "Hello!" << endl;
+void getBezier() {
+	current = current == BEZIER ? NONE : BEZIER;
+	if (current == NONE) {
+		cout << "Bye" << endl;
+	}
+	else {
+		cout << "Hello!" << endl;
+	}
+}
+void getBspline() {
+	current = current == BSPLINE ? NONE : BSPLINE;
+	if (current == NONE) {
+		cout << "Bye" << endl;
+	}
+	else {
+		cout << "Hello!" << endl;
+	}
+}
+void getNurbs() {
+	current = current == NURBS ? NONE : NURBS;
+	if (current == NONE) {
+		cout << "Bye" << endl;
+	}
+	else {
+		cout << "Hello!" << endl;
+	}
 }
 
 //Globals
@@ -102,9 +130,9 @@ void drawScene(void)
 	glLoadIdentity();
 
 	glPushMatrix();
-	splineButton.draw();
-	splineButton2.draw();
-	splineButton3.draw();
+	splineButton.draw(current == BEZIER);
+	splineButton2.draw(current == BSPLINE);
+	splineButton3.draw(current == NURBS);
 	glPopMatrix();
 
 	gluLookAt(
@@ -396,9 +424,9 @@ void mouseCallback(int button, int state, int x, int y) {
 		float oglX = (static_cast<float>(x) / windowWidhth) * 20.0f - 10.0f; // Normalize to [-10, 10]
 		float oglY = (static_cast<float>(windowHeight - y) / windowHeight) * (10.0f - (-10.0f)) - 10.0f; // Normalize to [-10, 10]
 
-		splineButton.isButtonPressed(oglX, oglY, testFunction);
-		splineButton2.isButtonPressed(oglX, oglY, testFunction);
-		splineButton3.isButtonPressed(oglX, oglY, testFunction);
+		splineButton.isButtonPressed(oglX, oglY, getBezier);
+		splineButton2.isButtonPressed(oglX, oglY, getBspline);
+		splineButton3.isButtonPressed(oglX, oglY, getNurbs);
 	}
 }
 

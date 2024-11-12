@@ -5,7 +5,7 @@
 #include <GL/freeglut.h>
 
 #include "Button.h"
-
+#include "SurfaceTypes.h"
 
 using namespace std;
 
@@ -39,9 +39,37 @@ const float Button::height = 1.25;
         }
 	}
 
-    void Button::draw(float width, float height) {
-        // Draw button rectangle
-        glColor3f(0.7f, 0.7f, 0.7f); 
+    void Button::draw(bool isPressed, float width, float height) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDisable(GL_LIGHTING);
+
+
+        // Draw button title
+        glColor3f(0.0f, 0.0f, 0.0f);
+        float textWidth = 0.0f;
+        for (char c : title) {
+            textWidth += glutBitmapWidth(GLUT_BITMAP_HELVETICA_12, c); // Accumulate width for each character
+        }
+
+        float centerX = xCoordinate + (width - textWidth / glutGet(GLUT_WINDOW_WIDTH) * 20.0f) / 2.0f;
+        float centerY = yCoordinate + (height / 2.0f - 0.075f); // Adjust to align vertically
+
+        glRasterPos2f(centerX, centerY); // Place text
+
+        // Render each character
+        for (char c : title) {
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
+        }
+
+        // Set button color based on pressed state
+        if (isPressed) {
+            glColor3f(0.0f, 0.46f, 0.25f);
+        }
+        else {
+            glColor3f(0.6f, 1.0f, 0.6f);
+        }
+
+        // Draw button background (rectangle)
         glBegin(GL_QUADS);
         glVertex2f(xCoordinate, yCoordinate);
         glVertex2f(xCoordinate + width, yCoordinate);
@@ -49,7 +77,9 @@ const float Button::height = 1.25;
         glVertex2f(xCoordinate, yCoordinate + height);
         glEnd();
 
-        glColor3f(0.0f, 0.0f, 0.0f);  // Black border
+        // Draw button border in black
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glLineWidth(2.0f); // Make the border slightly thicker for better visibility
         glBegin(GL_LINE_LOOP);
         glVertex2f(xCoordinate, yCoordinate);
         glVertex2f(xCoordinate + width, yCoordinate);
@@ -57,11 +87,5 @@ const float Button::height = 1.25;
         glVertex2f(xCoordinate, yCoordinate + height);
         glEnd();
 
-        // Draw button title
-        glColor3f(0.0f, 0.0f, 0.0f); 
-        glRasterPos2f(xCoordinate + width / 6, yCoordinate + height / 2);  // Position text
-
-        for (char c : title) {
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);  // Render each character
-        }
+        glEnable(GL_LIGHTING);
     }
