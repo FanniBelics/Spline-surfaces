@@ -11,7 +11,8 @@
 #include "Button.h"
 #include "SurfaceTypes.h"
 #include "spline.h"
-#include "types.cpp"
+
+using namespace std;
 
 
 // Pont kivonás, ami vektort ad két pont között
@@ -87,14 +88,6 @@ void getNurbs() {
 	else {
 		cout << "Hello!" << endl;
 	}
-}
-
-void getKnots() {
-	current = KNOTS;
-}
-
-void getNURBS() {
-	current = NURBS;
 }
 
 //Globals
@@ -397,16 +390,6 @@ void drawScene(void)
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
-	}
-
-	if (current == SPLINE) {
-		drawBSplineSurface(grid, 100);
-	}
-	else if (current == NURBS) {
-		
-	}
-	else if (current == KNOTS) {
-
 	}
 
 
