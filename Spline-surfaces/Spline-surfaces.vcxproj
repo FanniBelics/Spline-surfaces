@@ -28,6 +28,7 @@
     <ClInclude Include="button.h" />
     <ClInclude Include="Point3D.h" />
     <ClInclude Include="spline.h" />
+    <ClInclude Include="SurfaceTypes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
