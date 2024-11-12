@@ -16,6 +16,12 @@
     <Filter Include="Source Files\Button">
       <UniqueIdentifier>{afefeda6-a6b0-49fb-b64b-80909a7c6228}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\B_Spline">
+      <UniqueIdentifier>{e34a3b54-9f68-4836-a3e4-6b1bf2ad3029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Point3D">
+      <UniqueIdentifier>{ff0ead8e-608c-4cdd-9a03-9a91ec60c488}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -24,10 +30,22 @@
     <ClCompile Include="button.cpp">
       <Filter>Source Files\Button</Filter>
     </ClCompile>
+    <ClCompile Include="spline.cpp">
+      <Filter>Source Files\B_Spline</Filter>
+    </ClCompile>
+    <ClCompile Include="types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="button.h">
       <Filter>Source Files\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="spline.h">
+      <Filter>Source Files\B_Spline</Filter>
+    </ClInclude>
+    <ClInclude Include="Point3D.h">
+      <Filter>Source Files\Point3D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
