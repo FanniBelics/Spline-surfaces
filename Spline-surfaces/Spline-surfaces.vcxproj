@@ -21,9 +21,13 @@
   <ItemGroup>
     <ClCompile Include="button.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="spline.cpp" />
+    <ClCompile Include="types.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="button.h" />
+    <ClInclude Include="Point3D.h" />
+    <ClInclude Include="spline.h" />
     <ClInclude Include="SurfaceTypes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

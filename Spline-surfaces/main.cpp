@@ -10,17 +10,48 @@
 
 #include "Button.h"
 #include "SurfaceTypes.h"
+#include "spline.h"
+#include "types.cpp"
 
 
-using namespace std;
+// Pont kivonás, ami vektort ad két pont között
+Point3D subtractPoints(const Point3D& p1, const Point3D& p2) {
+	return { p1.x - p2.x, p1.y - p2.y, p1.z - p2.z };
+}
 
+// Kereszttermék számítása két vektor között
+Point3D crossProduct(const Point3D& v1, const Point3D& v2) {
+	return {
+		v1.y * v2.z - v1.z * v2.y,
+		v1.z * v2.x - v1.x * v2.z,
+		v1.x * v2.y - v1.y * v2.x
+	};
+}
 
-//Dff 3D points
-struct Point3D {
-	float x;
-	float y;
-	float z;
-};
+// Vektor normálása (hossza legyen 1)
+Point3D normalize(const Point3D& v) {
+	float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	if (length == 0) return { 0.0f, 0.0f, 1.0f };  // Alapértelmezett normál, ha a hossz 0
+	return { v.x / length, v.y / length, v.z / length };
+}
+
+Point3D calculateNormal(const std::vector<std::vector<Point3D>>& surfaceGrid, int i, int j) {
+	// Ellenõrizzük, hogy van-e elég szomszéd a normál kiszámításához
+	if (i + 1 < surfaceGrid.size() && j + 1 < surfaceGrid[i].size()) {
+		// Két szomszédos vektor a normálhoz
+		Point3D vec1 = subtractPoints(surfaceGrid[i + 1][j], surfaceGrid[i][j]);
+		Point3D vec2 = subtractPoints(surfaceGrid[i][j + 1], surfaceGrid[i][j]);
+
+		// Kereszttermék, hogy normálvektort kapjunk
+		Point3D normal = crossProduct(vec1, vec2);
+
+		// Normálás a hossz egységre
+		return normalize(normal);
+	}
+
+	// Ha nincs elég szomszéd, visszaadunk egy alapértelmezett normált
+	return { 0.0f, 0.0f, 1.0f };
+}
 
 
 //Buttons
@@ -58,14 +89,23 @@ void getNurbs() {
 	}
 }
 
+void getKnots() {
+	current = KNOTS;
+}
+
+void getNURBS() {
+	current = NURBS;
+}
+
 //Globals
 
-bool isMainVector = true;
-bool isGrid = true;
-bool isSurfaceGrid = true;
-bool isPoints = true;
-bool isSelectedPoint = true;
-bool isSelectedVector = true;
+bool isMainVector = true; //0
+bool isGrid = true; //1
+bool isPoints = true; //2
+bool isSelectedPoint = true; //3
+bool isSelectedVector = true; //4
+bool isSurfaceGrid = true; //5
+bool isSurface = true; //6
 
 float camX = 5.0f, camY = 5.0f, camZ = 5.0f; 
 float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f; 
@@ -76,10 +116,11 @@ int nP = 0, mP = 0;
 
 //matrix for points
 std::vector<std::vector<Point3D>> grid;
-std::vector<std::vector<Point3D>> surfaceGrid(32, std::vector<Point3D>(32));
+std::vector<std::vector<Point3D>> surfaceGrid(8, std::vector<Point3D>(8));
 
 // Angles to rotate
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; 
+
 
 void drawSphere(float x, float y, float z, float radius) {
 	glPushMatrix();
@@ -107,7 +148,11 @@ void setup(void)
 
 	for (int i = 0; i < N; ++i) {
 		for (int j = 0; j < M; ++j) {
-			grid[i][j] = { static_cast<float>((i*8.0f) / (N-1)), 0.0f ,static_cast<float>((j*8.0f) / (M-1))}; // x, y, z coordinates
+			float gridX = static_cast<float>((i * 8.0f) / (N - 1));
+			float gridZ = static_cast<float>((j * 8.0f) / (M - 1));
+			float gridY = sqrt( ((4.0f - abs(4.0f - gridX)) * (4.0f - abs(4.0f-gridZ))) + ((4.0f - abs(4.0f - gridX)) + (4.0f - abs(4.0f - gridZ))));
+
+			grid[i][j] = {gridX , gridY ,gridZ}; // x, y, z coordinates
 		}
 	}
 
@@ -176,7 +221,7 @@ void drawScene(void)
 		glColor3f(0.0, 0.0, 0.0);
 	}
 
-	if (isSurfaceGrid) {
+	if (isSurface) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(1.0, 0.5, 0.0);
 
@@ -203,6 +248,78 @@ void drawScene(void)
 			}
 		}	
 		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor3f(0.0, 0.0, 0.0);
+	}
+
+	if (isSurface) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor3f(1.0, 0.5, 0.0);
+
+		if (surfaceGrid.size() == 1) {
+			glBegin(GL_LINES);
+
+			for (int j = 0; j < surfaceGrid[0].size(); j++) {
+				glVertex3f(surfaceGrid[0][j].x, surfaceGrid[0][j].y, surfaceGrid[0][j].z);
+			}
+
+			glEnd();
+		}
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
+				glBegin(GL_TRIANGLE_STRIP);
+
+				for (int j = 0; j < surfaceGrid[i].size(); j++) {
+
+					// Normálvektor kiszámítása az adott csúcs körül
+					Point3D normal = calculateNormal(surfaceGrid, i, j);
+
+					// Normálvektor beállítása az aktuális csúcshoz
+					glNormal3f(normal.x, normal.y, normal.z);
+
+					// Elsõ pont
+					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
+
+					// Második pont
+					glNormal3f(normal.x, normal.y, normal.z); // Ugyanaz a normál a második pontnál is
+					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
+				}
+
+				glEnd();
+			}
+		}	
+		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor3f(0.0, 0.0, 0.0);
+	}
+
+	if (isSurfaceGrid) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor3f(0.5, 0.5, 0.5);
+
+		if (surfaceGrid.size() == 1) {
+			glBegin(GL_LINES);
+
+			for (int j = 0; j < surfaceGrid[0].size(); j++) {
+				glVertex3f(surfaceGrid[0][j].x, surfaceGrid[0][j].y, surfaceGrid[0][j].z);
+			}
+
+			glEnd();
+		}
+		else {
+			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
+				glBegin(GL_TRIANGLE_STRIP);
+
+				for (int j = 0; j < surfaceGrid[i].size(); j++) {
+					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
+					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
+				}
+
+				glEnd();
+			}
+		}
+
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
 	}
@@ -276,10 +393,20 @@ void drawScene(void)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glColor3f(0.0, 1.0, 1.0);
 
-		drawSphere(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z, 0.1f);
+		drawSphere(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z, 0.12f);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
+	}
+
+	if (current == SPLINE) {
+		drawBSplineSurface(grid, 100);
+	}
+	else if (current == NURBS) {
+		
+	}
+	else if (current == KNOTS) {
+
 	}
 
 
@@ -410,6 +537,34 @@ void keyInput(unsigned char key, int x, int y)
 		grid[nP][mP].z = grid[nP][mP].z + 0.1f;
 		glutPostRedisplay();
 		break;
+	case '0':
+		isMainVector = !isMainVector;
+		glutPostRedisplay();
+		break;
+	case '1':
+		isGrid = !isGrid;
+		glutPostRedisplay();
+		break;
+	case '2':
+		isPoints = !isPoints;
+		glutPostRedisplay();
+		break;
+	case '3':
+		isSelectedPoint = !isSelectedPoint;
+		glutPostRedisplay();
+		break;
+	case '4':
+		isSelectedVector = !isSelectedVector;
+		glutPostRedisplay();
+		break;
+	case '5':
+		isSurfaceGrid = !isSurfaceGrid;
+		glutPostRedisplay();
+		break;
+	case '6':
+		isSurface = !isSurface;
+		glutPostRedisplay();
+		break;
 	default:
 		break;
 	}
@@ -448,7 +603,7 @@ void setupLighting() {
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
 
 	GLfloat lightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
-	GLfloat lightPosition[] = { 1.0f, 1.0f, 1.0f, 0.0f }; 
+	GLfloat lightPosition[] = { 0.0f, 10.0f, 0.0f, 0.0f }; 
 
 	glEnable(GL_LIGHT0);                 
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
@@ -493,6 +648,7 @@ int main(int argc, char** argv)
 	glEnable(GL_LIGHTING);    
 	setupLighting();
 	setupMaterial();
+	glShadeModel(GL_SMOOTH);
 
 	setup();
 
