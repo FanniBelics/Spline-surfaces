@@ -22,12 +22,14 @@
     <ClCompile Include="bezier.cpp" />
     <ClCompile Include="button.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="nurbs.cpp" />
     <ClCompile Include="Point3DUtils.cpp" />
     <ClCompile Include="spline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bezier.h" />
     <ClInclude Include="button.h" />
+    <ClInclude Include="nurbs.h" />
     <ClInclude Include="Point3D.h" />
     <ClInclude Include="Point3DUtils.h" />
     <ClInclude Include="spline.h" />

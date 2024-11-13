@@ -3,7 +3,7 @@
 // Calculate the B-spline basis function value N_{i,p}(u)
 float BSplineBasis(int i, int p, float u, const std::vector<float>& knotVector) {
     if (p == 0) {
-        return (u >= knotVector[i] && u < knotVector[i + 1]) ? 1.0f : 0.0f;
+        return (u >= knotVector[i] && u <= knotVector[i + 1]) ? 1.0f : 0.0f;
     }
 
     float leftTerm = 0.0f;
@@ -20,7 +20,7 @@ float BSplineBasis(int i, int p, float u, const std::vector<float>& knotVector) 
 }
 
 // Generate a uniform knot vector
-std::vector<float> generateUniformKnotVector(int numControlPoints, int degree) {
+std::vector<float> generateKnotVector(int numControlPoints, int degree) {
     int n = numControlPoints + degree + 1;
     std::vector<float> knotVector(n);
 
@@ -47,16 +47,16 @@ std::vector<std::vector<Point3D>> BSplineSurface(const std::vector<std::vector<P
         throw std::invalid_argument("Degree cannot be greater than or equal to the number of control points.");
     }
 
-    std::vector<float> uKnotVector = generateUniformKnotVector(n, uDegree);
-    std::vector<float> vKnotVector = generateUniformKnotVector(m, vDegree);
+    std::vector<float> uKnotVector = generateKnotVector(n, uDegree);
+    std::vector<float> vKnotVector = generateKnotVector(m, vDegree);
 
     std::vector<std::vector<Point3D>> surfaceGrid(uResolution, std::vector<Point3D>(vResolution));
 
     for (int uIndex = 0; uIndex < uResolution; uIndex++) {
-        float u = static_cast<float>(uIndex + 1) / (uResolution+1);
+        float u = static_cast<float>(uIndex) / (uResolution-1);
         
         for (int vIndex = 0; vIndex < vResolution; vIndex++) {
-            float v = static_cast<float>(vIndex + 1) / (vResolution+1);
+            float v = static_cast<float>(vIndex) / (vResolution-1);
  
             Point3D point(0.0f, 0.0f, 0.0f);
 

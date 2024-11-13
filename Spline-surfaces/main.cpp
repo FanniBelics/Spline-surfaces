@@ -12,6 +12,7 @@
 #include "SurfaceTypes.h"
 #include "spline.h"
 #include "bezier.h"
+#include "nurbs.h"
 
 using namespace std;
 
@@ -150,6 +151,9 @@ void drawScene(void)
 		break;
 	case(BSPLINE):
 		surfaceGrid = BSplineSurface(grid, 8,8, N-1, M-1);
+		break;
+	case(NURBS):
+		surfaceGrid = NURBSSurface(grid,8,8,N-1,M-1);
 		break;
 	default:
 		for (int i = 0; i < surfaceGrid.size(); i++) {

@@ -25,6 +25,9 @@
     <Filter Include="Source Files\Bezier">
       <UniqueIdentifier>{92fc89d3-ffaf-4823-9151-f70247319b42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Nurbs">
+      <UniqueIdentifier>{1e6f2468-5c27-4602-a0f5-26be1e54d3c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -41,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="bezier.cpp">
       <Filter>Source Files\Bezier</Filter>
+    </ClCompile>
+    <ClCompile Include="nurbs.cpp">
+      <Filter>Source Files\Nurbs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="bezier.h">
       <Filter>Source Files\Bezier</Filter>
+    </ClInclude>
+    <ClInclude Include="nurbs.h">
+      <Filter>Source Files\Nurbs</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
