@@ -22,6 +22,9 @@
     <Filter Include="Source Files\Point3D">
       <UniqueIdentifier>{ff0ead8e-608c-4cdd-9a03-9a91ec60c488}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Bezier">
+      <UniqueIdentifier>{92fc89d3-ffaf-4823-9151-f70247319b42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -33,8 +36,11 @@
     <ClCompile Include="spline.cpp">
       <Filter>Source Files\B_Spline</Filter>
     </ClCompile>
-    <ClCompile Include="types.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Point3DUtils.cpp">
+      <Filter>Source Files\Point3D</Filter>
+    </ClCompile>
+    <ClCompile Include="bezier.cpp">
+      <Filter>Source Files\Bezier</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +52,15 @@
     </ClInclude>
     <ClInclude Include="Point3D.h">
       <Filter>Source Files\Point3D</Filter>
+    </ClInclude>
+    <ClInclude Include="SurfaceTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Point3DUtils.h">
+      <Filter>Source Files\Point3D</Filter>
+    </ClInclude>
+    <ClInclude Include="bezier.h">
+      <Filter>Source Files\Bezier</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
