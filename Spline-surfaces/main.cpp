@@ -148,6 +148,9 @@ void drawScene(void)
 	case(BEZIER):
 		surfaceGrid = BezierSurface(grid,8);
 		break;
+	case(BSPLINE):
+		surfaceGrid = BSplineSurface(grid, 8,8, N-1, M-1);
+		break;
 	default:
 		for (int i = 0; i < surfaceGrid.size(); i++) {
 			for (int j = 0; j < surfaceGrid[i].size(); j++) {
