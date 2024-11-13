@@ -1,65 +1,81 @@
 #include "spline.h"
-#include <GL/glew.h>
-#include <GL/freeglut.h>
 
-// Helper function to calculate B-Spline basis functions
-float calculateBSplineBasis(int i, int degree, float t, const std::vector<float>& knots) {
-    if (degree == 0) {
-        return (knots[i] <= t && t < knots[i + 1]) ? 1.0f : 0.0f;
+// Calculate the B-spline basis function value N_{i,p}(u)
+float BSplineBasis(int i, int p, float u, const std::vector<float>& knotVector) {
+    if (p == 0) {
+        return (u >= knotVector[i] && u < knotVector[i + 1]) ? 1.0f : 0.0f;
     }
 
-    float denom1 = knots[i + degree] - knots[i];
-    float denom2 = knots[i + degree + 1] - knots[i + 1];
+    float leftTerm = 0.0f;
+    if (knotVector[i + p] != knotVector[i]) {
+        leftTerm = (u - knotVector[i]) / (knotVector[i + p] - knotVector[i]) * BSplineBasis(i, p - 1, u, knotVector);
+    }
 
-    float term1 = (denom1 == 0) ? 0 : ((t - knots[i]) / denom1) * calculateBSplineBasis(i, degree - 1, t, knots);
-    float term2 = (denom2 == 0) ? 0 : ((knots[i + degree + 1] - t) / denom2) * calculateBSplineBasis(i + 1, degree - 1, t, knots);
+    float rightTerm = 0.0f;
+    if (knotVector[i + p + 1] != knotVector[i + 1]) {
+        rightTerm = (knotVector[i + p + 1] - u) / (knotVector[i + p + 1] - knotVector[i + 1]) * BSplineBasis(i + 1, p - 1, u, knotVector);
+    }
 
-    return term1 + term2;
+    return leftTerm + rightTerm;
 }
 
-// Function to draw the B-Spline surface
-void drawBSplineSurface(const std::vector<std::vector<Point3D>>& controlPoints, int resolution) {
-    int n = controlPoints.size();     // Number of rows of control points
-    int m = controlPoints[0].size(); // Number of columns of control points
-    int degree = 3;                  // Degree of the B-Spline
+// Generate a uniform knot vector
+std::vector<float> generateUniformKnotVector(int numControlPoints, int degree) {
+    int n = numControlPoints + degree + 1;
+    std::vector<float> knotVector(n);
 
-    // Generate uniform knot vectors
-    std::vector<float> knotU(n + degree + 1);
-    std::vector<float> knotV(m + degree + 1);
-    for (int i = 0; i <= n + degree; ++i) {
-        knotU[i] = static_cast<float>(i) / (n + degree);
+    for (int i = 0; i <= degree; ++i) {
+        knotVector[i] = 0.0f;
     }
-    for (int i = 0; i <= m + degree; ++i) {
-        knotV[i] = static_cast<float>(i) / (m + degree);
+    for (int i = degree + 1; i < n - degree - 1; ++i) {
+        knotVector[i] = static_cast<float>(i - degree) / (n - 2 * degree - 1);
+    }
+    for (int i = n - degree - 1; i < n; ++i) {
+        knotVector[i] = 1.0f;
     }
 
-    // Iterate over the parametric space of the surface
-    glColor3f(0.0f, 0.0f, 1.0f); // Set color to blue
-    glBegin(GL_POINTS);
-    for (int ru = 0; ru <= resolution; ++ru) {
-        float u = static_cast<float>(ru) / resolution;
+    return knotVector;
+}
 
-        for (int rv = 0; rv <= resolution; ++rv) {
-            float v = static_cast<float>(rv) / resolution;
 
-            // Calculate the point on the surface
-            Point3D point = { 0.0f, 0.0f, 0.0f };
+// Function to generate a B-Spline surface
+std::vector<std::vector<Point3D>> BSplineSurface(const std::vector<std::vector<Point3D>>& controlGrid, int uResolution, int vResolution, int uDegree, int vDegree) {
+    int n = controlGrid.size();
+    int m = controlGrid[0].size();
 
+    if (uDegree >= n || vDegree >= m) {
+        throw std::invalid_argument("Degree cannot be greater than or equal to the number of control points.");
+    }
+
+    std::vector<float> uKnotVector = generateUniformKnotVector(n, uDegree);
+    std::vector<float> vKnotVector = generateUniformKnotVector(m, vDegree);
+
+    std::vector<std::vector<Point3D>> surfaceGrid(uResolution, std::vector<Point3D>(vResolution));
+
+    for (int uIndex = 0; uIndex < uResolution; uIndex++) {
+        float u = static_cast<float>(uIndex + 1) / (uResolution+1);
+        
+        for (int vIndex = 0; vIndex < vResolution; vIndex++) {
+            float v = static_cast<float>(vIndex + 1) / (vResolution+1);
+ 
+            Point3D point(0.0f, 0.0f, 0.0f);
+
+            // Calculate the B-spline surface point
             for (int i = 0; i < n; ++i) {
-                float bu = calculateBSplineBasis(i, degree, u, knotU);
+                float Ni_u = BSplineBasis(i, uDegree, u, uKnotVector);
 
                 for (int j = 0; j < m; ++j) {
-                    float bv = calculateBSplineBasis(j, degree, v, knotV);
+                    float Nj_v = BSplineBasis(j, vDegree, v, vKnotVector);
 
-                    point.x += bu * bv * controlPoints[i][j].x;
-                    point.y += bu * bv * controlPoints[i][j].y;
-                    point.z += bu * bv * controlPoints[i][j].z;
+                    // Add contribution of control point to the surface point
+                    Point3D scaledPoint = scalePoint(controlGrid[i][j], Ni_u * Nj_v);
+                    point = addPoints(point, scaledPoint);
                 }
             }
 
-            // Draw the point
-            glVertex3f(point.x, point.y, point.z);
+            surfaceGrid[uIndex][vIndex] = point;
         }
     }
-    glEnd();
+
+    return surfaceGrid;
 }
