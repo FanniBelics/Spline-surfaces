@@ -11,49 +11,9 @@
 #include "Button.h"
 #include "SurfaceTypes.h"
 #include "spline.h"
+#include "bezier.h"
 
 using namespace std;
-
-
-// Pont kivonás, ami vektort ad két pont között
-Point3D subtractPoints(const Point3D& p1, const Point3D& p2) {
-	return { p1.x - p2.x, p1.y - p2.y, p1.z - p2.z };
-}
-
-// Kereszttermék számítása két vektor között
-Point3D crossProduct(const Point3D& v1, const Point3D& v2) {
-	return {
-		v1.y * v2.z - v1.z * v2.y,
-		v1.z * v2.x - v1.x * v2.z,
-		v1.x * v2.y - v1.y * v2.x
-	};
-}
-
-// Vektor normálása (hossza legyen 1)
-Point3D normalize(const Point3D& v) {
-	float length = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-	if (length == 0) return { 0.0f, 0.0f, 1.0f };  // Alapértelmezett normál, ha a hossz 0
-	return { v.x / length, v.y / length, v.z / length };
-}
-
-Point3D calculateNormal(const std::vector<std::vector<Point3D>>& surfaceGrid, int i, int j) {
-	// Ellenõrizzük, hogy van-e elég szomszéd a normál kiszámításához
-	if (i + 1 < surfaceGrid.size() && j + 1 < surfaceGrid[i].size()) {
-		// Két szomszédos vektor a normálhoz
-		Point3D vec1 = subtractPoints(surfaceGrid[i + 1][j], surfaceGrid[i][j]);
-		Point3D vec2 = subtractPoints(surfaceGrid[i][j + 1], surfaceGrid[i][j]);
-
-		// Kereszttermék, hogy normálvektort kapjunk
-		Point3D normal = crossProduct(vec1, vec2);
-
-		// Normálás a hossz egységre
-		return normalize(normal);
-	}
-
-	// Ha nincs elég szomszéd, visszaadunk egy alapértelmezett normált
-	return { 0.0f, 0.0f, 1.0f };
-}
-
 
 //Buttons
 Button splineButton(-9, 8, "Bezier");
@@ -70,6 +30,7 @@ void getBezier() {
 	else {
 		cout << "Hello!" << endl;
 	}
+	glutPostRedisplay();
 }
 void getBspline() {
 	current = current == BSPLINE ? NONE : BSPLINE;
@@ -79,6 +40,7 @@ void getBspline() {
 	else {
 		cout << "Hello!" << endl;
 	}
+	glutPostRedisplay();
 }
 void getNurbs() {
 	current = current == NURBS ? NONE : NURBS;
@@ -88,6 +50,7 @@ void getNurbs() {
 	else {
 		cout << "Hello!" << endl;
 	}
+	glutPostRedisplay();
 }
 
 //Globals
@@ -149,13 +112,6 @@ void setup(void)
 		}
 	}
 
-	//testing purpuses currently
-	for (int i = 0; i < surfaceGrid.size(); i++) {
-		for (int j = 0; j < surfaceGrid[i].size(); j++) {
-			surfaceGrid[i][j] = { static_cast<float>((i * 8.0f) / (surfaceGrid.size()-1)), 0.0f ,static_cast<float>((j * 8.0f) / (surfaceGrid[i].size()-1))};
-		}
-	}
-
 }
 
 // Drawing routine.
@@ -185,12 +141,25 @@ void drawScene(void)
 	glRotatef(Xangle, 1.0, 0.0, 0.0);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	glColor3f(0.0, 0.0, 0.0);
 
+	switch (current)
+	{
+	case(BEZIER):
+		surfaceGrid = BezierSurface(grid,8);
+		break;
+	default:
+		for (int i = 0; i < surfaceGrid.size(); i++) {
+			for (int j = 0; j < surfaceGrid[i].size(); j++) {
+				surfaceGrid[i][j] = { static_cast<float>((i * 8.0f) / (surfaceGrid.size() - 1)), 0.0f ,static_cast<float>((j * 8.0f) / (surfaceGrid[i].size() - 1)) };
+			}
+		}
+		break;
+	}
 
 
 	if (isMainVector) {
+		glDisable(GL_LIGHTING);
 		glColor3f(1.0, 0.0, 0.0);
 		glBegin(GL_LINES);
 		glVertex3f(0.0f, 0.0f, 0.0f);
@@ -212,82 +181,11 @@ void drawScene(void)
 		glTranslatef(1.0, 0.0, 1.0);
 
 		glColor3f(0.0, 0.0, 0.0);
-	}
-
-	if (isSurface) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glColor3f(1.0, 0.5, 0.0);
-
-		if (surfaceGrid.size() == 1) {
-			glBegin(GL_LINES);
-
-			for (int j = 0; j < surfaceGrid[0].size(); j++) {
-				glVertex3f(surfaceGrid[0][j].x, surfaceGrid[0][j].y, surfaceGrid[0][j].z);
-			}
-
-			glEnd();
-		}
-		else {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
-				glBegin(GL_TRIANGLE_STRIP);
-
-				for (int j = 0; j < surfaceGrid[i].size(); j++) {
-					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
-					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
-				}
-
-				glEnd();
-			}
-		}	
-		
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glColor3f(0.0, 0.0, 0.0);
-	}
-
-	if (isSurface) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glColor3f(1.0, 0.5, 0.0);
-
-		if (surfaceGrid.size() == 1) {
-			glBegin(GL_LINES);
-
-			for (int j = 0; j < surfaceGrid[0].size(); j++) {
-				glVertex3f(surfaceGrid[0][j].x, surfaceGrid[0][j].y, surfaceGrid[0][j].z);
-			}
-
-			glEnd();
-		}
-		else {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
-				glBegin(GL_TRIANGLE_STRIP);
-
-				for (int j = 0; j < surfaceGrid[i].size(); j++) {
-
-					// Normálvektor kiszámítása az adott csúcs körül
-					Point3D normal = calculateNormal(surfaceGrid, i, j);
-
-					// Normálvektor beállítása az aktuális csúcshoz
-					glNormal3f(normal.x, normal.y, normal.z);
-
-					// Elsõ pont
-					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
-
-					// Második pont
-					glNormal3f(normal.x, normal.y, normal.z); // Ugyanaz a normál a második pontnál is
-					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
-				}
-
-				glEnd();
-			}
-		}	
-		
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glColor3f(0.0, 0.0, 0.0);
+		glEnable(GL_LIGHTING);
 	}
 
 	if (isSurfaceGrid) {
+		glDisable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.5, 0.5, 0.5);
 
@@ -315,33 +213,72 @@ void drawScene(void)
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
+		glEnable(GL_LIGHTING);
 	}
 
-	if (isSelectedVector) {
+	if (isSurface) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glColor3f(1.0, 0.5, 0.0);
 
-		glColor3f(1.0, 0.0, 0.0);
-		glBegin(GL_LINES);
-		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z);
-		glVertex3f(grid[nP][mP].x + 1.0f, grid[nP][mP].y, grid[nP][mP].z);
-		glEnd();
+		if (surfaceGrid.size() == 1) {
+			glBegin(GL_LINES);
 
-		glColor3f(0.0, 1.0, 0.0);
-		glBegin(GL_LINES);
-		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z);
-		glVertex3f(grid[nP][mP].x, grid[nP][mP].y + 1.0f, grid[nP][mP].z);
-		glEnd();
+			for (int j = 0; j < surfaceGrid[0].size(); j++) {
+				glVertex3f(surfaceGrid[0][j].x, surfaceGrid[0][j].y, surfaceGrid[0][j].z);
+			}
 
-		glColor3f(0.0, 0.0, 1.0);
-		glBegin(GL_LINES);
-		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z);
-		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z + 1.0f);
-		glEnd();
+			glEnd();
+		}
+		else {
+			glPolygonMode(GL_FRONT, GL_FILL);
+			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
+				glBegin(GL_TRIANGLE_STRIP);
 
+				for (int j = 0; j < surfaceGrid[i].size(); j++) {
+
+					// Normálvektor kiszámítása az adott csúcs körül
+					Point3D normal = scalePoint(calculateNormal(surfaceGrid, i, j), -1.0f);
+
+					glNormal3f(normal.x, normal.y, normal.z); 
+					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
+
+					glNormal3f(normal.x, normal.y, normal.z); //ugyan az a normál
+					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
+
+				}
+
+				glEnd();
+			}
+
+			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
+				glBegin(GL_TRIANGLE_STRIP);
+
+				for (int j = 0; j < surfaceGrid[i].size(); j++) {
+
+					// Normálvektor kiszámítása az adott csúcs körül
+					Point3D normal = calculateNormal(surfaceGrid, i, j);
+
+					glNormal3f(normal.x, normal.y, normal.z); //ugyan az a normál
+					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
+
+					glNormal3f(normal.x, normal.y, normal.z);
+					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
+
+				}
+
+				glEnd();
+			}
+
+		}	
+		
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.0, 0.0, 0.0);
+
 	}
 
 	if (isGrid) {
 
+		glDisable(GL_LIGHTING);
 		glColor3f(0.0, 0.0, 0.0);
 
 		for (int i = 0; i < N; ++i) {
@@ -367,6 +304,7 @@ void drawScene(void)
 		}
 
 		glColor3f(0.0, 0.0, 0.0);
+		glEnable(GL_LIGHTING);
 	}
 
 	if (isPoints) {
@@ -392,6 +330,29 @@ void drawScene(void)
 		glColor3f(0.0, 0.0, 0.0);
 	}
 
+	if (isSelectedVector) {
+		glDisable(GL_LIGHTING);
+		glColor3f(1.0, 0.0, 0.0);
+		glBegin(GL_LINES);
+		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z);
+		glVertex3f(grid[nP][mP].x + 1.0f, grid[nP][mP].y, grid[nP][mP].z);
+		glEnd();
+
+		glColor3f(0.0, 1.0, 0.0);
+		glBegin(GL_LINES);
+		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z);
+		glVertex3f(grid[nP][mP].x, grid[nP][mP].y + 1.0f, grid[nP][mP].z);
+		glEnd();
+
+		glColor3f(0.0, 0.0, 1.0);
+		glBegin(GL_LINES);
+		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z);
+		glVertex3f(grid[nP][mP].x, grid[nP][mP].y, grid[nP][mP].z + 1.0f);
+		glEnd();
+
+		glColor3f(0.0, 0.0, 0.0);
+		glEnable(GL_LIGHTING);
+	}
 
 	glFlush();
 }
@@ -582,11 +543,11 @@ void printInteraction(void)
 
 void setupLighting() {
 	
-	GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f }; 
+	GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 0.9f }; 
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
 
-	GLfloat lightColor[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
-	GLfloat lightPosition[] = { 0.0f, 10.0f, 0.0f, 0.0f }; 
+	GLfloat lightColor[] = { 1.0f, 1.0f, 1.0f, 0.9f }; 
+	GLfloat lightPosition[] = { 10.0f, 10.0f, 10.0f, 1.0f }; 
 
 	glEnable(GL_LIGHT0);                 
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
@@ -595,14 +556,14 @@ void setupLighting() {
 
 void setupMaterial() {
 	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
-	GLfloat materialSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+	GLfloat materialSpecular[] = { 1.0f, 1.0f, 1.0f, 0.9f };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialSpecular);
 
 
 	GLfloat materialShininess = 50.0f;
-	glMaterialf(GL_FRONT, GL_SHININESS, materialShininess);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, materialShininess);
 }
 
 
@@ -632,6 +593,7 @@ int main(int argc, char** argv)
 	setupLighting();
 	setupMaterial();
 	glShadeModel(GL_SMOOTH);
+	glDisable(GL_CULL_FACE);
 
 	setup();
 
