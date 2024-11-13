@@ -233,14 +233,14 @@ void drawScene(void)
 			glEnd();
 		}
 		else {
-			glPolygonMode(GL_FRONT, GL_FILL);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
 				glBegin(GL_TRIANGLE_STRIP);
 
 				for (int j = 0; j < surfaceGrid[i].size(); j++) {
 
 					// Normálvektor kiszámítása az adott csúcs körül
-					Point3D normal = scalePoint(calculateNormal(surfaceGrid, i, j), -1.0f);
+					Point3D normal = calculateNormal(surfaceGrid, i, j);
 
 					glNormal3f(normal.x, normal.y, normal.z); 
 					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
@@ -253,24 +253,7 @@ void drawScene(void)
 				glEnd();
 			}
 
-			for (int i = 0; i < surfaceGrid.size() - 1; i++) {
-				glBegin(GL_TRIANGLE_STRIP);
-
-				for (int j = 0; j < surfaceGrid[i].size(); j++) {
-
-					// Normálvektor kiszámítása az adott csúcs körül
-					Point3D normal = calculateNormal(surfaceGrid, i, j);
-
-					glNormal3f(normal.x, normal.y, normal.z); //ugyan az a normál
-					glVertex3f(surfaceGrid[i][j].x, surfaceGrid[i][j].y, surfaceGrid[i][j].z);
-
-					glNormal3f(normal.x, normal.y, normal.z);
-					glVertex3f(surfaceGrid[i + 1][j].x, surfaceGrid[i + 1][j].y, surfaceGrid[i + 1][j].z);
-
-				}
-
-				glEnd();
-			}
+			
 
 		}	
 		
@@ -549,6 +532,9 @@ void setupLighting() {
 	GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 0.9f }; 
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
 
+	float modelTwoside[] = { GL_TRUE };
+	glLightModelfv(GL_LIGHT_MODEL_TWO_SIDE, modelTwoside);
+
 	GLfloat lightColor[] = { 1.0f, 1.0f, 1.0f, 0.9f }; 
 	GLfloat lightPosition[] = { 10.0f, 10.0f, 10.0f, 1.0f }; 
 
@@ -596,7 +582,6 @@ int main(int argc, char** argv)
 	setupLighting();
 	setupMaterial();
 	glShadeModel(GL_SMOOTH);
-	glDisable(GL_CULL_FACE);
 
 	setup();
 
