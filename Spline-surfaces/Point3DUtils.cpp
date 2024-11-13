@@ -39,6 +39,16 @@ Point3D calculateNormal(const std::vector<std::vector<Point3D>>& surfaceGrid, in
 		Point3D vec2 = subtractPoints(surfaceGrid[i][j + 1], surfaceGrid[i][j]);
 
 		// Kereszttermék, hogy normálvektort kapjunk
+		Point3D normal = crossProduct(vec2, vec1);
+
+		// Normálás a hossz egységre
+		return normalize(normal);
+	}
+	else if (j != 0 && i + 1 < surfaceGrid.size()) {
+		Point3D vec1 = subtractPoints(surfaceGrid[i + 1][j], surfaceGrid[i][j]);
+		Point3D vec2 = subtractPoints(surfaceGrid[i][j - 1], surfaceGrid[i][j]);
+
+		// Kereszttermék, hogy normálvektort kapjunk
 		Point3D normal = crossProduct(vec1, vec2);
 
 		// Normálás a hossz egységre
