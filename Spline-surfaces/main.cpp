@@ -393,32 +393,32 @@ void keyInput(unsigned char key, int x, int y)
 		exit(0);
 		break;
 
-	case 'W':
+	case 'w':
 		Xangle += 5.0;
 		if (Xangle > 360.0) Xangle -= 360.0;
 		glutPostRedisplay();
 		break;
-	case 'S':
+	case 's':
 		Xangle -= 5.0;
 		if (Xangle < 0.0) Xangle += 360.0;
 		glutPostRedisplay();
 		break;
-	case 'A':
+	case 'a':
 		Yangle += 5.0;
 		if (Yangle > 360.0) Yangle -= 360.0;
 		glutPostRedisplay();
 		break;
-	case 'D':
+	case 'd':
 		Yangle -= 5.0;
 		if (Yangle < 0.0) Yangle += 360.0;
 		glutPostRedisplay();
 		break;
-	case 'Q':
+	case 'q':
 		Zangle += 5.0;
 		if (Zangle > 360.0) Zangle -= 360.0;
 		glutPostRedisplay();
 		break;
-	case 'E':
+	case 'e':
 		Zangle -= 5.0;
 		if (Zangle < 0.0) Zangle += 360.0;
 		glutPostRedisplay();
@@ -463,6 +463,14 @@ void keyInput(unsigned char key, int x, int y)
 		grid[nP][mP].y = grid[nP][mP].y + 0.1f;
 		glutPostRedisplay();
 		break;
+	case 'v':
+		grid[nP][mP].w = grid[nP][mP].w - 0.1f;
+		glutPostRedisplay();
+		break;
+	case 'V':
+		grid[nP][mP].w = grid[nP][mP].w + 0.1f;
+		glutPostRedisplay();
+		break;
 	case 'z':
 		grid[nP][mP].z = grid[nP][mP].z - 0.1f;
 		glutPostRedisplay();
@@ -498,6 +506,15 @@ void keyInput(unsigned char key, int x, int y)
 	case '6':
 		isSurface = !isSurface;
 		glutPostRedisplay();
+		break;
+	case '7':
+		getBezier();
+		break;
+	case '8':
+		getBspline();
+		break;
+	case '9':
+		getNurbs();
 		break;
 	default:
 		break;
