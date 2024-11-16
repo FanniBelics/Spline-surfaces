@@ -11,4 +11,3 @@ float bernstein(int i, int n, float t);
 std::vector<std::vector<Point3D>> BezierSurface(const std::vector<std::vector<Point3D>>& grid, int resolution);
 
 #endif
-

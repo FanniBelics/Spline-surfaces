@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="bezier.cpp" />
     <ClCompile Include="button.cpp" />
+    <ClCompile Include="convert.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="nurbs.cpp" />
     <ClCompile Include="Point3DUtils.cpp" />
@@ -34,6 +35,9 @@
     <ClInclude Include="Point3DUtils.h" />
     <ClInclude Include="spline.h" />
     <ClInclude Include="SurfaceTypes.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="convert.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
