@@ -39,7 +39,7 @@ std::vector<float> generateKnotVector(int numControlPoints, int degree) {
 
 
 // Function to generate a B-Spline surface
-std::vector<std::vector<Point3D>> BSplineSurface(const std::vector<std::vector<Point3D>>& controlGrid, int uResolution, int vResolution, int uDegree, int vDegree) {
+std::vector<std::vector<Point3D>> BSplineSurface(const std::vector<std::vector<Point3D>>& controlGrid, int uResolution, int vResolution, int uDegree, int vDegree, bool isClamped) {
     int n = controlGrid.size();
     int m = controlGrid[0].size();
 
@@ -53,10 +53,10 @@ std::vector<std::vector<Point3D>> BSplineSurface(const std::vector<std::vector<P
     std::vector<std::vector<Point3D>> surfaceGrid(uResolution, std::vector<Point3D>(vResolution));
 
     for (int uIndex = 0; uIndex < uResolution; uIndex++) {
-        float u = static_cast<float>(uIndex) / (uResolution-1);
+        float u = static_cast<float>(uIndex + !isClamped) / (uResolution + (!isClamped * 2) - 1);
         
         for (int vIndex = 0; vIndex < vResolution; vIndex++) {
-            float v = static_cast<float>(vIndex) / (vResolution-1);
+            float v = static_cast<float>(vIndex + !isClamped) / (vResolution + (!isClamped * 2) - 1);
  
             Point3D point(0.0f, 0.0f, 0.0f);
 
