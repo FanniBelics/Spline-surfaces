@@ -13,6 +13,7 @@
 #include "spline.h"
 #include "bezier.h"
 #include "nurbs.h"
+#include "convert.h"
 
 using namespace std;
 
@@ -25,37 +26,20 @@ SurfaceType current = NONE;
 
 void getBezier() {
 	current = current == BEZIER ? NONE : BEZIER;
-	if (current == NONE) {
-		cout << "Bye" << endl;
-	}
-	else {
-		cout << "Hello!" << endl;
-	}
 	glutPostRedisplay();
 }
 void getBspline() {
 	current = current == BSPLINE ? NONE : BSPLINE;
-	if (current == NONE) {
-		cout << "Bye" << endl;
-	}
-	else {
-		cout << "Hello!" << endl;
-	}
 	glutPostRedisplay();
 }
 void getNurbs() {
 	current = current == NURBS ? NONE : NURBS;
-	if (current == NONE) {
-		cout << "Bye" << endl;
-	}
-	else {
-		cout << "Hello!" << endl;
-	}
 	glutPostRedisplay();
 }
 
 //Globals
 
+bool isStats = true; //l
 bool isMainVector = true; //0
 bool isGrid = true; //1
 bool isPoints = true; //2
@@ -77,6 +61,35 @@ std::vector<std::vector<Point3D>> surfaceGrid(8, std::vector<Point3D>(8));
 
 // Angles to rotate
 static float Xangle = 0.0, Yangle = 0.0, Zangle = 0.0; 
+
+void writeStats(float x, float y) {
+	string content = "Current point:\n(x: " + convert(grid[nP][mP].x) +
+		", y: " + convert(grid[nP][mP].y) +
+		", z: " + convert(grid[nP][mP].z) + ")\n" +
+		"Weight: " + convert(grid[nP][mP].w) + "\n" +
+		"Angles: (" + convert(Xangle) + ", " + convert(Yangle) + ", " + convert(Zangle) + ")\n" + 
+		"Current gridpoint: (" + convertInt(nP+1) + ", " + convertInt(mP+1) + ")";
+
+	glColor3f(0.0f, 0.0f, 0.0f);
+
+	vector<string> lines;
+	size_t start = 0, end;
+	while ((end = content.find('\n', start)) != string::npos) {
+		lines.push_back(content.substr(start, end - start));
+		start = end + 1;
+	}
+	lines.push_back(content.substr(start));
+
+	glRasterPos2f(x, y);
+
+	for (const auto& line : lines) {
+		for (char c : line) {
+			glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
+		}
+		y -= 0.7f; 
+		glRasterPos2f(x, y);
+	}
+}
 
 
 void drawSphere(float x, float y, float z, float radius) {
@@ -128,6 +141,11 @@ void drawScene(void)
 	splineButton.draw(current == BEZIER);
 	splineButton2.draw(current == BSPLINE);
 	splineButton3.draw(current == NURBS);
+	glPopMatrix();
+
+	glPushMatrix();
+	if (isStats)
+		writeStats(6.0f, 9.0f);
 	glPopMatrix();
 
 	gluLookAt(
@@ -361,10 +379,10 @@ void resize(int w, int h)
 
 	
 	if (w <= h) {
-		glOrtho(-10.0, 10.0, -10.0 / aspect, 10.0 / aspect, -100.0, 100.0);
+		glOrtho(-7.5 , 10.0, -10.0 / aspect, 10.0 / aspect, -100.0, 100.0);
 	}
 	else {
-		glOrtho(-10.0 * aspect, 10.0 * aspect, -10.0, 10.0, -100.0, 100.0);
+		glOrtho(-7.5 * aspect, 10.0 * aspect, -10.0, 10.0, -100.0, 100.0);
 	}
 
 	glMatrixMode(GL_MODELVIEW); 
@@ -516,6 +534,10 @@ void keyInput(unsigned char key, int x, int y)
 	case '9':
 		getNurbs();
 		break;
+	case 'l':
+		isStats = !isStats;
+		glutPostRedisplay();
+		break;
 	default:
 		break;
 	}
@@ -523,7 +545,6 @@ void keyInput(unsigned char key, int x, int y)
 
 void mouseCallback(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		// Get the window height
 		int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 		int windowWidhth = glutGet(GLUT_WINDOW_WIDTH);
 
@@ -587,7 +608,7 @@ int main(int argc, char** argv)
 	glutInitContextProfile(GLUT_COMPATIBILITY_PROFILE);
 
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(800, 500);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow("Spline Surfaces");
 	glutDisplayFunc(drawScene);
