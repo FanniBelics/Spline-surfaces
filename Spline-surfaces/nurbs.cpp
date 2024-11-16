@@ -1,6 +1,6 @@
 #include "nurbs.h"
 
-std::vector<std::vector<Point3D>> NURBSSurface(const std::vector<std::vector<Point3D>>& controlGrid, int uResolution, int vResolution, int uDegree, int vDegree) {
+std::vector<std::vector<Point3D>> NURBSSurface(const std::vector<std::vector<Point3D>>& controlGrid, int uResolution, int vResolution, int uDegree, int vDegree, bool isClamped) {
     int n = controlGrid.size();
     int m = controlGrid[0].size();
 
@@ -13,11 +13,11 @@ std::vector<std::vector<Point3D>> NURBSSurface(const std::vector<std::vector<Poi
 
     std::vector<std::vector<Point3D>> surfaceGrid(uResolution, std::vector<Point3D>(vResolution));
 
-    for (int uIndex = 0; uIndex < uResolution; ++uIndex) {
-        float u = uKnotVector[uDegree] + (static_cast<float>(uIndex) / (uResolution - 1)) * (uKnotVector[n] - uKnotVector[uDegree]);
+    for (int uIndex = 0; uIndex < uResolution; uIndex++) {
+        float u = static_cast<float>(uIndex + !isClamped) / (uResolution + (!isClamped * 2) - 1);
 
-        for (int vIndex = 0; vIndex < vResolution; ++vIndex) {
-            float v = vKnotVector[vDegree] + (static_cast<float>(vIndex) / (vResolution - 1)) * (vKnotVector[m] - vKnotVector[vDegree]);
+        for (int vIndex = 0; vIndex < vResolution; vIndex++) {
+            float v = static_cast<float>(vIndex + !isClamped) / (vResolution + (!isClamped * 2) - 1);
 
             Point3D numerator(0.0f, 0.0f, 0.0f, 0.0f); // Súlyozott összeg
             float denominator = 0.0f; // Súlyok összegzése

@@ -48,6 +48,8 @@ bool isSelectedVector = true; //4
 bool isSurfaceGrid = true; //5
 bool isSurface = true; //6
 
+bool isClamped = true;
+
 float camX = 5.0f, camY = 5.0f, camZ = 5.0f; 
 float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f; 
 float upX = 0.0f, upY = 1.0f, upZ = 0.0f;
@@ -168,10 +170,10 @@ void drawScene(void)
 		surfaceGrid = BezierSurface(grid,8);
 		break;
 	case(BSPLINE):
-		surfaceGrid = BSplineSurface(grid, 8,8, N-1, M-1);
+		surfaceGrid = BSplineSurface(grid, 8,8, N-1, M-1, isClamped);
 		break;
 	case(NURBS):
-		surfaceGrid = NURBSSurface(grid,8,8,N-1,M-1);
+		surfaceGrid = NURBSSurface(grid,8,8,N-1,M-1, isClamped);
 		break;
 	default:
 		for (int i = 0; i < surfaceGrid.size(); i++) {
@@ -536,6 +538,10 @@ void keyInput(unsigned char key, int x, int y)
 		break;
 	case 'l':
 		isStats = !isStats;
+		glutPostRedisplay();
+		break;
+	case 'c':
+		isClamped = !isClamped;
 		glutPostRedisplay();
 		break;
 	default:
